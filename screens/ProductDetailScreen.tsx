@@ -52,15 +52,45 @@ const ProductDetailScreen = ({ route, navigation }: any) => {
     (classification: any) => classification.color
   );
   //lấy size theo màu đã chọn
-  const filteredClassifications = classifications?.filter(
-    (classification: any) => classification.color === selectedColor
-  );
+  const getFilteredClassifications = () => {
+    return (
+      classifications?.filter(
+        (classification: any) => classification.color === selectedColor
+      ) || []
+    );
+  };
 
+  // useEffect(() => {
+  //   if (selectedColor && classifications) {
+  //     const filtered = classifications.filter(
+  //       (classification: any) => classification.color === selectedColor
+  //     );
+  //     setSelectedSize(filtered?.[0]?.size || "");
+  //   }
+  // }, [selectedColor, classifications]);
   useEffect(() => {
-    setSelectedColor(listColor?.[0]);
-    setSelectedSize(filteredClassifications?.[0]?.size);
-  }, [selectedColor]);
-
+    if (product?.productDetailResponseList?.length > 0) {
+      const classifications = product.productDetailResponseList.map(
+        (varProduct: any) => ({
+          id: varProduct.id,
+          color: varProduct.color,
+          size: varProduct.size,
+          img: varProduct.img,
+          price: varProduct.price,
+          availableQuantity: varProduct.quantity,
+        })
+      );
+  
+      const firstColor = classifications[0]?.color;
+      const firstSize = classifications.find(
+        (item: any) => item.color === firstColor
+      )?.size;
+  
+      setSelectedColor(firstColor || "");
+      setSelectedSize(firstSize || "");
+    }
+  }, [product]);
+  
   // Mở modal khi cần
   const openModal = () => {
     setIsModalVisible(true);
@@ -79,7 +109,7 @@ const ProductDetailScreen = ({ route, navigation }: any) => {
 
   // viet ham set san pham duoc chon sau khi chon color va size
   const handleAddProductToCard = () => {
-    const selectedClassification = filteredClassifications?.find(
+    const selectedClassification = getFilteredClassifications()?.find(
       (item: any) => item.size === selectedSize
     );
     if (selectedClassification) {
@@ -170,9 +200,10 @@ const ProductDetailScreen = ({ route, navigation }: any) => {
             >
               {/* Hình ảnh sản phẩm */}
               <Image
-                source={{ uri: filteredClassifications?.[0]?.img }}
+                source={{ uri: getFilteredClassifications()?.[0]?.img }}
                 style={{ width: "100%", height: 200, borderRadius: 10 }}
               />
+
               {/* Chọn Màu */}
               <View style={{ marginTop: 15 }}>
                 <Text style={{ fontWeight: "bold" }}>Chọn Màu</Text>
@@ -194,7 +225,7 @@ const ProductDetailScreen = ({ route, navigation }: any) => {
                   onValueChange={setSelectedSize}
                   style={{ height: 50 }}
                 >
-                  {filteredClassifications?.map((item: any, index: any) => (
+                  {getFilteredClassifications()?.map((item: any, index: any) => (
                     <Picker.Item
                       key={index}
                       label={item.size}

@@ -6,6 +6,7 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from "react-native";
 import CartItem from "../components/CartItem";
 import { useDispatch, useSelector } from "react-redux";
@@ -26,18 +27,17 @@ const CartScreen = ({ navigation }: any) => {
   const handleSelectItem = (id: number, selected: boolean) => {
     setSelectedItems((prevSelected) => {
       if (selected) {
-        return [...prevSelected, id];  // Thêm item vào danh sách chọn
+        return [...prevSelected, id]; // Thêm item vào danh sách chọn
       } else {
-        return prevSelected.filter(item => item !== id);  // Xóa item khỏi danh sách chọn
+        return prevSelected.filter((item) => item !== id); // Xóa item khỏi danh sách chọn
       }
     });
   };
 
-
   const currentUser: any = useSelector(
     (state: RootState) => state.users.currentUser
   );
-  const {vouchers}: any = useSelector((state: any) => state.vouchers);
+  const { vouchers }: any = useSelector((state: any) => state.vouchers);
 
   useEffect(() => {
     setCartDetails(cart?.cartDetails);
@@ -66,23 +66,21 @@ const CartScreen = ({ navigation }: any) => {
     dispatch(updateProductInCart({ param }));
     setCartDetails((prev) =>
       prev.map((item) =>
-        item.productDetail.id === id
-          ? { ...item, quantity: quantity }
-          : item
+        item.productDetail.id === id ? { ...item, quantity: quantity } : item
       )
     );
   };
   const getFinalTotal = () => {
     let total = 0;
     cartDetails
-      ?.filter((item:any) => selectedItems.includes(item.id))
+      ?.filter((item: any) => selectedItems.includes(item.id))
       .forEach((item: any) => {
         total += item.productDetail.price * item.quantity;
       });
-  
+
     if (!selectedVoucher) return total;
-  
-    if(selectedVoucher?.value * total < selectedVoucher?.maxMoney) {
+
+    if (selectedVoucher?.value * total < selectedVoucher?.maxMoney) {
       // Giảm theo phần trăm (ví dụ 0.1 là 10%)
       return total - total * selectedVoucher?.value;
     } else {
@@ -90,14 +88,24 @@ const CartScreen = ({ navigation }: any) => {
       return Math.max(0, total - selectedVoucher?.maxMoney);
     }
   };
-  
+
   useEffect(() => {
     setTotal(getFinalTotal());
   }, [cartDetails, selectedVoucher]);
   const handleCheckout = () => {
-    navigation.navigate("Checkout", { cartDetailIds: selectedItems, price: getFinalTotal(), voucherId: selectedVoucher?.id });
+    if (selectedItems.length === 0) {
+      Alert.alert(
+        "Thông báo",
+        "Vui lòng chọn ít nhất một sản phẩm để thanh toán!"
+      );
+      return;
+    }
+    navigation.navigate("Checkout", {
+      cartDetailIds: selectedItems,
+      price: getFinalTotal(),
+      voucherId: selectedVoucher?.id,
+    });
   };
-
 
   return (
     <View style={styles.container}>
@@ -110,7 +118,7 @@ const CartScreen = ({ navigation }: any) => {
                 cartDetail={item}
                 onRemove={removeItem}
                 onUpdate={updateItem}
-                onSelect={handleSelectItem}  // Truyền hàm chọn vào đây
+                onSelect={handleSelectItem} // Truyền hàm chọn vào đây
               />
             )}
             keyExtractor={(item) => item.id.toString()}
@@ -118,7 +126,7 @@ const CartScreen = ({ navigation }: any) => {
             ListFooterComponent={
               <View style={styles.voucherContainer}>
                 <Text style={styles.voucherLabel}>Chọn voucher:</Text>
-                {vouchers?.map((voucher:any) => (
+                {vouchers?.map((voucher: any) => (
                   <TouchableOpacity
                     key={voucher.id}
                     style={[
@@ -128,7 +136,9 @@ const CartScreen = ({ navigation }: any) => {
                     ]}
                     onPress={() => setSelectedVoucher(voucher)}
                   >
-                    <Text>{voucher?.code} - {voucher?.description}</Text>
+                    <Text>
+                      {voucher?.code} - {voucher?.description}
+                    </Text>
                   </TouchableOpacity>
                 ))}
               </View>
