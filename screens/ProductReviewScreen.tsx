@@ -24,9 +24,9 @@ const ProductReviewScreen = ({ route }: any) => {
   const [type, setType] = useState("create");
   const dispatch = useDispatch();
   const [reviewData, setReviewData] = useState<any>({
-    productId: orderItem.varProduct.productId,
+    productId: orderItem.productDetail.id,
     rating: 0,
-    comment: "",
+    description: "",
     userId: currentUser.id,
   });
   // Lấy review nếu đã có
@@ -35,19 +35,19 @@ const ProductReviewScreen = ({ route }: any) => {
       dispatch(
         fetchReviewByUserAndProduct({
           userId: currentUser.id,
-          productId: orderItem.varProduct.productId,
+          productId: orderItem.productDetail.id,
         })
       );
     }
-  }, [dispatch, currentUser.id, orderItem.varProduct.productId]);
+  }, [dispatch, currentUser.id, orderItem.productDetail.id]);
 
   // Nếu đã có review, cập nhật vào reviewData
   useEffect(() => {
     if (review) {
       setReviewData({
-        productId: orderItem.varProduct.productId,
+        productId: orderItem.productDetail.id,
         rating: review.rating || 0,
-        comment: review.comment || "",
+        description: review.description || "",
         userId: currentUser.id,
       });
       setType("update"); // Nếu đã có review thì cập nhật
@@ -56,25 +56,25 @@ const ProductReviewScreen = ({ route }: any) => {
 
   // Hàm cập nhật số sao được chọn
   const handleRating = (star: number) => {
-    
+
     setReviewData({ ...reviewData, rating: star });
   };
 
   // Hàm xử lý gửi đánh giá
   const handleSubmit = () => {
-    console.log(reviewData);
+    // console.log("++++++++++++++++++++++++",reviewData);
     dispatch(createReview(reviewData));
-    navigation.navigate("ProductDetail", { productId: orderItem.varProduct.productId });
+    navigation.navigate("ProductDetail", { productId: orderItem.productDetail.id });
   };
 
   return (
     <View style={styles.container}>
       {/* Ảnh và thông tin sản phẩm */}
       <View style={styles.header}>
-        <Image style={styles.image} source={{ uri: orderItem.image }} />
-        <Text style={styles.productName}>{orderItem.name}</Text>
+        <Image style={styles.image} source={{ uri: orderItem.productDetail.img }} />
+        <Text style={styles.productName}>{orderItem.productName}</Text>
         <Text style={styles.productCategory}>
-          {Object.values(orderItem.varProduct.attribute).join(",")}
+          
         </Text>
       </View>
 
@@ -99,11 +99,11 @@ const ProductReviewScreen = ({ route }: any) => {
 
       {/* Bình luận */}
       <TextInput
-        style={styles.commentInput}
+        style={styles.descriptionInput}
         placeholder="Viết bình luận của bạn..."
-        value={reviewData.comment}
+        value={reviewData.description}
         onChangeText={(value) =>
-          setReviewData({ ...reviewData, comment: value })
+          setReviewData({ ...reviewData, description: value })
         }
         multiline
       />
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
   starContainer: {
     flexDirection: "row",
   },
-  commentInput: {
+  descriptionInput: {
     height: 100,
     borderColor: "#ccc",
     borderWidth: 1,

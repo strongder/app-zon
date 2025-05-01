@@ -80,17 +80,17 @@ const ProductDetailScreen = ({ route, navigation }: any) => {
           availableQuantity: varProduct.quantity,
         })
       );
-  
+
       const firstColor = classifications[0]?.color;
       const firstSize = classifications.find(
         (item: any) => item.color === firstColor
       )?.size;
-  
+
       setSelectedColor(firstColor || "");
       setSelectedSize(firstSize || "");
     }
   }, [product]);
-  
+
   // Mở modal khi cần
   const openModal = () => {
     setIsModalVisible(true);
@@ -124,7 +124,7 @@ const ProductDetailScreen = ({ route, navigation }: any) => {
           dispatch(fetchCart());
           setIsModalVisible(false);
         })
-        .catch((error) => {
+        .catch((error: any) => {
           // Xử lý lỗi nếu có
           console.error("Error adding product to cart:", error);
         });
@@ -225,13 +225,15 @@ const ProductDetailScreen = ({ route, navigation }: any) => {
                   onValueChange={setSelectedSize}
                   style={{ height: 50 }}
                 >
-                  {getFilteredClassifications()?.map((item: any, index: any) => (
-                    <Picker.Item
-                      key={index}
-                      label={item.size}
-                      value={item.size}
-                    />
-                  ))}
+                  {getFilteredClassifications()?.map(
+                    (item: any, index: any) => (
+                      <Picker.Item
+                        key={index}
+                        label={item.size}
+                        value={item.size}
+                      />
+                    )
+                  )}
                 </Picker>
               </View>
 
@@ -312,11 +314,14 @@ const ProductDetailScreen = ({ route, navigation }: any) => {
                 data={reviews}
                 contentContainerStyle={styles.listReview}
                 renderItem={({ item }) => <ReviewItem review={item} />}
-                keyExtractor={(item: any) => item?.id}
+                keyExtractor={(item, index) =>
+                  item?.id?.toString() || `review-${index}`
+                }
                 horizontal
                 showsHorizontalScrollIndicator={false}
               />
             )}
+
             <Pressable onPress={handleMoreReview}>
               <Text
                 style={{

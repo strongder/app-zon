@@ -24,7 +24,11 @@ const NotificationScreen = ({ notifications, setUnreadCount }: any) => {
   }, [dispatch]);
   const handleReadNotification = async (item: any) => {
     if (item.type === "ORDER") {
-      dispatch(readNotification(item.id));
+      dispatch(readNotification(item.id))
+        .unwrap()
+        .then(() => {
+          dispatch(fetchNotifications());
+        });
       navigation.navigate("OrderDetail", { orderId: item.data });
     }
     setUnreadCount();

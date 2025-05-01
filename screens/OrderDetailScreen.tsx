@@ -18,29 +18,45 @@ const OrderDetailScreen = ({ navigation, route }: any) => {
   const { orderId } = route.params;
   const dispatch = useDispatch();
   const [isChangingPayment, setIsChangingPayment] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState("COD");
+  const [paymentMethod, setPaymentMethod] = useState("CASH");
   const order = useSelector((state: any) => state.orders.order);
 
   useEffect(() => {
     dispatch(fetchOrderById(orderId));
   }, [dispatch]);
 
-  console.log(order);
   const handleCancelOrder = () => {
-    dispatch(cancelOrder(orderId));
+    const param = {
+      id: orderId,
+      status: "CANCELED", // đảm bảo đúng enum
+      paymentStatus: order.paymentStatus,
+    };
+    console.log("param", param);
+    dispatch(cancelOrder({ param }))
+      .unwrap()
+      .then(() => {
+        alert("Đơn hàng đã được hủy thành công");
+        navigation.navigate("OrderHistory"); // Điều hướng về
+        // trang lịch sử đơn hàng sau khi hủy thành công
+      })
+      .catch((error: any) => {
+        console.error("Failed to cancel order:", error);
+        // Xử lý lỗi nếu cần
+      });
   };
 
-  const handlePaymentOrder = async (orderId: number) => {
-    // Tạo dữ liệu thanh toán với orderId
-    const data = {
-      orderId: orderId,
-      redirectUrl: "", // Bạn có thể thêm URL để điều hướng sau khi thanh toán hoàn tất
+   const handlePaymentOrder = async (orderId: number) => {
+      const param = {
+        orderId: orderId,
+        amount : order.totalAmount,
+      }
+      const payment = await dispatch(createPayment({ param })).unwrap();
+      console.log(payment);
+      if (payment && payment.paymentUrl) {
+        console.log("----------------------")
+        navigation.navigate("VnpayPayment", { paymentUrl: payment.paymentUrl });
+      }
     };
-    const payment = await dispatch(createPayment(data)).unwrap();
-    if (payment && payment.paymentUrl) {
-      navigation.navigate("VnpayPayment", { paymentUrl: payment.paymentUrl });
-    }
-  };
 
   // Thay đổi phương thức thanh toán
   const handleChangePaymentMethod = async () => {
@@ -53,7 +69,7 @@ const OrderDetailScreen = ({ navigation, route }: any) => {
     setIsChangingPayment(false);
   };
 
-  console.log(order);
+  console.log("check", order);
 
   return (
     <View
@@ -63,32 +79,27 @@ const OrderDetailScreen = ({ navigation, route }: any) => {
         <>
           <ScrollView style={styles.scrollContainer}>
             <Text style={styles.title}>Chi tiết đơn hàng</Text>
-            {/* <Text style={styles.text}>Mã đơn hàng: {order.orderCode}</Text> */}
             <Text style={styles.text}>
               Phương thức thanh toán: {order?.paymentMethod}
             </Text>
             <Text style={styles.text}>Trạng thái: {order?.paymentStatus}</Text>
             <Text style={styles.text}>
-              Tổng tiền: {order?.total?.toLocaleString()} VNĐ
+              Tổng tiền: {order?.totalAmount?.toLocaleString()} VNĐ
             </Text>
             <Text style={styles.text}>
               Ngày tạo: {new Date(order?.createdAt)?.toLocaleString()}
             </Text>
 
             <Text style={styles.subtitle}>Địa chỉ giao hàng</Text>
-            <Text style={styles.text}>
-              Người nhận: {order?.fullName}
-            </Text>
+            <Text style={styles.text}>Người nhận: {order?.fullName}</Text>
             <Text style={styles.text}>Điện thoại: {order?.phone}</Text>
-            <Text style={styles.text}>
-              Địa chỉ: {order?.shippingAddress}
-            </Text>
+            <Text style={styles.text}>Địa chỉ: {order?.shippingAddress}</Text>
 
             <Text style={styles.subtitle}>Sản phẩm</Text>
-            {order?.orderItems?.map((item: any) => (
+            {order?.orderDetails?.map((item: any) => (
               <View key={item.id} style={styles.productItem}>
                 <Image
-                  source={{ uri: item.image }}
+                  source={{ uri: item.productDetail.img }}
                   style={styles.productImage}
                 />
                 <View style={styles.productInfo}>
@@ -98,37 +109,27 @@ const OrderDetailScreen = ({ navigation, route }: any) => {
                   </Text>
                   <Text style={styles.text}>Số lượng: {item.quantity}</Text>
                   <Text style={styles.text}>
-                    Phân loại:{" "}
-                    {Object.values(item.varProduct.attribute).join(",")}
+                    Phân loại: {item.productDetail.size} -{" "}
+                    {item.productDetail.color}
                   </Text>
                 </View>
               </View>
             ))}
           </ScrollView>
           <View style={styles.actionsContainer}>
-            {(order?. paymentStatus=== "PENDING" ||
-              order?.paymentStatus === "PENDING_PAYMENT") && (
+            {order?.status === "PENDING" && (
               <>
-                <TouchableOpacity
-                  style={styles.buttonAction}
-                  onPress={() => setIsChangingPayment(true)}
-                >
-                  <Text style={styles.buttonText}>
-                    Đổi phương thức thanh toán
-                  </Text>
-                </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.buttonAction}
                   onPress={handleCancelOrder}
                 >
                   <Text style={styles.buttonText}>Hủy đơn hàng</Text>
                 </TouchableOpacity>
-
               </>
             )}
 
-            {order.paymentMethod === "VNPAY" &&
-              order.status === "PENDING_PAYMENT" && (
+            {order.paymentMethod === "CREDIT_CARD" &&
+              order.status === "PENDING" && (
                 <TouchableOpacity
                   style={styles.payment}
                   onPress={() => handlePaymentOrder(order.id)}
@@ -138,37 +139,6 @@ const OrderDetailScreen = ({ navigation, route }: any) => {
               )}
           </View>
         </>
-      )}
-      {isChangingPayment && (
-        <View style={styles.changePayment}>
-          <Text style={styles.title}>Đổi phương thức thanh toán</Text>
-
-          <TouchableOpacity
-            style={[
-              styles.buttonAction,
-              paymentMethod === "COD" ? styles.selectedButton : {},
-            ]}
-            onPress={() => setPaymentMethod("COD")}
-          >
-            <Text>Thanh toán khi nhận hàng</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.buttonAction,
-              paymentMethod === "VNPAY" ? styles.selectedButton : {},
-            ]}
-            onPress={() => setPaymentMethod("VNPAY")}
-          >
-            <Text>Thanh toán online (VNPAY)</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.confirmButton}
-            onPress={handleChangePaymentMethod}
-          >
-            <Text style={styles.buttonText}>Xác nhận</Text>
-          </TouchableOpacity>
-        </View>
       )}
     </View>
   );

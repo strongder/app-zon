@@ -6,7 +6,8 @@ export const fetchOrderById: any = createAsyncThunk(
   async (orderId) => {
     try {
       const response = await axiosInstance.get(`/orders/${orderId}`);
-      return response.data.result;
+      console.log("response", response.data.data);
+      return response.data.data;
     } catch (error) {
       console.error("Get order fail:", error);
       throw error; // Ném lỗi để có thể xử lý trong component
@@ -33,7 +34,7 @@ export const placeOrder: any = createAsyncThunk(
     try {
       const response = await axiosInstance.post(`/orders`, data);
       return response.data.data;
-    } catch (error: any) {
+    } catch (error:any) {
       // 👇 Log chi tiết lỗi từ backend
       if (error.response) {
         console.error("Create order fail:", error.response.data);
@@ -46,29 +47,29 @@ export const placeOrder: any = createAsyncThunk(
   }
 );
 
-
-export const cancelOrder: any = createAsyncThunk(
+export const cancelOrder:any = createAsyncThunk(
   "orders/cancelOrder",
-  async (orderId) => {
+  async ({ param }: any, thunkAPI) => {
     try {
-      const response = await axiosInstance.put(
-        `/orders/cancel-order/${orderId}`
-      );
-      return response.data.result;
-    } catch (error) {
+      const response = await axiosInstance.put(`/orders`, null, {
+        params: param,
+      });
+      return response.data;
+    } catch (error: any) {
       console.error("Cancel order fail:", error);
-      throw error; // Ném lỗi để có thể xử lý trong component
+      return thunkAPI.rejectWithValue(error.response?.data || "Lỗi không xác định");
     }
   }
 );
 
+
 export const completeOrder: any = createAsyncThunk(
   "orders/completeOrder",
-  async (orderId) => {
+  async ({ param }: any) => {
     try {
-      const response = await axiosInstance.put(
-        `/orders/complete-order/${orderId}`
-      );
+      const response = await axiosInstance.put(`/orders}`, {
+        params: param,
+      });
       return response.data.result;
     } catch (error) {
       console.error("Complete order fail:", error);
@@ -94,7 +95,6 @@ export const updatePaymentMethod: any = createAsyncThunk(
     }
   }
 );
-
 
 const initialState: any = {
   listOrderByUser: [],
@@ -133,13 +133,13 @@ const orderSlice = createSlice({
         state.loading = "succeeded";
         state.order = action.payload;
         state.listOrderByUser = state.listOrderByUser.map((order: any) => {
-          return order.id === action.payload.id ? action.payload : order;
+          return order.id === action.payload.data ? action.payload : order;
         });
       })
       .addCase(completeOrder.fulfilled, (state, action) => {
         state.loading = "succeeded";
         state.listOrderByUser = state.listOrderByUser.map((order: any) => {
-          return order.id === action.payload.id ? action.payload : order;
+          return order.id === action.payload.data ? action.payload : order;
         });
       })
       .addCase(updatePaymentMethod.fulfilled, (state, action) => {
@@ -148,7 +148,7 @@ const orderSlice = createSlice({
         state.listOrderByUser = state.listOrderByUser.map((order: any) => {
           return order.id === action.payload.id ? action.payload : order;
         });
-        });
+      });
   },
 });
 

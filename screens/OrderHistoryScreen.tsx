@@ -34,7 +34,7 @@ const OrderHistoryScreen = ({ navigation }: any) => {
       {/* Filter Status Bar */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
       <View style={styles.topbar}>
-        {["PENDING", "CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"].map((status) => (
+        {["PENDING", "CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELED"].map((status) => (
           <TouchableOpacity
             key={status}
             onPress={() => setSelectedStatus(status)}

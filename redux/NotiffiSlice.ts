@@ -25,9 +25,9 @@ export const fetchUnreadNotifications: any = createAsyncThunk(
 export const readNotification: any = createAsyncThunk(
   "notifications/readNotification",
   async (id: number) => {
-    try {
-      const response = await axiosInstance.put(`/notifications/read/${id}`);
-      return id;
+    try {  
+      const response = await axiosInstance.put(`/notifications/${id}/read`);
+      return response.data.data;
     } catch (error) {
       console.log(error);
     }
@@ -61,10 +61,14 @@ const notiffiSlice = createSlice({
         state.unreadCount = action.payload;
       })
       .addCase(readNotification.fulfilled, (state, action) => {
-        state.notifications = state.notifications.map((noti: any) => {
-          return noti.id === action.payload ? { ...noti, read: true } : noti;
-        });
+        const id = action.payload;
+        console.log("readNotification", id);
+        state.notifications = state.notifications.map((noti: any) =>
+          noti.id === id ? { ...noti, read: true } : noti
+        );
+        
       });
+      
   },
 });
 export default notiffiSlice.reducer;

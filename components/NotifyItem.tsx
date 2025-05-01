@@ -3,11 +3,13 @@ import { View, Text, Image, StyleSheet } from "react-native";
 import axiosInstance from "../api";
 
 const NotifyItem = ({ notifyItem }: any) => {
+  console.log("NotifyItem render", notifyItem);
   const [order, setOrder] = useState<any>(null);
 
   // Fetch order details if notification type is 'ORDER'
   useEffect(() => {
     if (notifyItem?.type === "ORDER") {
+      console.log("Fetching order details for ID:", notifyItem?.data);
       fetchOrderDetails(notifyItem?.data);
     }
   }, [notifyItem?.type]);
@@ -16,7 +18,8 @@ const NotifyItem = ({ notifyItem }: any) => {
   const fetchOrderDetails = async (orderId: any) => {
     try {
       const response = await axiosInstance.get(`/orders/${orderId}`);
-      setOrder(response.data.result);
+      console.log("Order details response:", response.data.data);
+      setOrder(response.data.data);
     } catch (error) {
       console.error("Failed to fetch order details:", error);
     }
@@ -27,14 +30,15 @@ const NotifyItem = ({ notifyItem }: any) => {
         <View style={styles.notificationContainer}>
           {notifyItem?.type === "ORDER" && (
             <Image
-              source={{ uri: order?.orderItems[0]?.image }}
+              source={{ uri: order?.orderDetails[0]?.productDetail.img }}
               style={styles.image}
             />
           )}
           <View style={styles.textContainer}>
             <View style ={styles.title}>
               <Text style={styles.textTitle}>{notifyItem?.title}</Text>
-              {!notifyItem.read && <Text style={styles.unreadText}>.</Text>}
+              {notifyItem.read == false && 
+              <Text style={styles.unreadText}>.</Text>}
             </View>
             <Text style={styles.message}>{notifyItem?.message}</Text>
           </View>

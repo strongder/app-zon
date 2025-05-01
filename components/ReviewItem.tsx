@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 
 const ReviewItem = ({review}: any) => {
+  console.log("ReviewItem render", review);
 
   const generateRating: any= (rating: number) => {
     let result = '';
@@ -15,8 +16,8 @@ const ReviewItem = ({review}: any) => {
       <Image source={{ uri: review?.user?.avatar }} style={styles.avatar} />
       <View style={styles.content}>
         <Text style={styles.name}>{review?.user?.username}</Text>
-        <Text style={styles.rating}>Đánh giá: {generateRating(review?.rating)}</Text>
-        <Text style={styles.comment}>{review?.comment}</Text>
+        <Text style={styles.rating}>Đánh giá: {generateRating(review?.rate)}</Text>
+        <Text style={styles.description}>{review?.description}</Text>
       </View>
     </View>
   );
@@ -54,7 +55,7 @@ const styles = StyleSheet.create({
     color: '#f39c12',
     marginVertical: 5,
   },
-  comment: {
+  description: {
     color: '#333',
   },
 });

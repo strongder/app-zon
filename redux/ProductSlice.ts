@@ -110,7 +110,6 @@ const productSlice = createSlice({
         state.loading = "succeeded";
       })
       .addCase(fetchProductBySearch.fulfilled, (state, action) => {
-        console.log(action)
         state.listProductSearch = action.payload;
         state.loading = "succeeded";
       })
