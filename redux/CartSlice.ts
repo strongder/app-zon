@@ -21,7 +21,8 @@ export const addProductToCart: any = createAsyncThunk(
         const response = await axiosInstance.put(`/carts`, null,{params: param} );
         return response.data.data;
         } catch (error: any) {
-         if (error.response.data.code === 1005) {
+        // console.log("Add product to cart fail:", error.response.data.message);
+         if (error.response.data.message === "out of stock") {
             Alert.alert("Thông báo", "Kho hàng không đủ sản phẩm"); 
             return;
          }
@@ -31,17 +32,17 @@ export const addProductToCart: any = createAsyncThunk(
 export const removeProductFromCart: any = createAsyncThunk(
     "cart/removeProduct",
     async ({ param }: any) => {
-        try {
-            // Sử dụng params để truyền query parameters
-            const response = await axiosInstance.put(`/carts/remove-cart-item`, null,{
-                params: param  // Truyền các tham số dưới dạng query parameters
-            });
-            return response.data.result;
-        } catch (error) {
-            console.log("Remove product from cart fail:", error);
-        }
+      try {
+        const response = await axiosInstance.delete(`/carts/cart-details`, {
+          params: param, // Truyền các ID sản phẩm cần xóa dạng query string: ?ids=1&ids=2
+        });
+        return response.data.result;
+      } catch (error) {
+        console.log("Remove product from cart fail:", error);
+        throw error;
+      }
     }
-);
+  );
 
 export const updateProductInCart: any = createAsyncThunk(
     "cart/updateProduct",
@@ -53,7 +54,11 @@ export const updateProductInCart: any = createAsyncThunk(
             });
             
             return response.data.data;
-        } catch (error) {
+        } catch (error:any) {
+            if (error.response.data.message === "out of stock") {
+                Alert.alert("Thông báo", "Kho hàng không đủ sản phẩm"); 
+                return;
+             }
             console.log("Update product in cart fail:", error);
         }
     }

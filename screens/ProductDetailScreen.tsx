@@ -112,6 +112,7 @@ const ProductDetailScreen = ({ route, navigation }: any) => {
     const selectedClassification = getFilteredClassifications()?.find(
       (item: any) => item.size === selectedSize
     );
+  
     if (selectedClassification) {
       const param = {
         productDetailId: selectedClassification.id,

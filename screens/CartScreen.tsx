@@ -51,11 +51,11 @@ const CartScreen = ({ navigation }: any) => {
 
   const removeItem = (id: number) => {
     const param = {
-      cartItemId: id,
-      userId: currentUser.id, // Đảm bảo currentUser.id có giá trị đúng
+      ids: id, // phải là mảng để axios gửi ?ids=1
     };
-    dispatch(removeProductFromCart({ param })); // Truyền param vào như đã định
+    dispatch(removeProductFromCart({ param }));
   };
+
   const updateItem = (id: number, quantity: number, actionType: number) => {
     // Update item in cart
     const param = {
