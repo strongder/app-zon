@@ -1,3 +1,4 @@
+import React from "react";
 import {
   View,
   Text,
@@ -10,6 +11,7 @@ import {
 import { useDispatch } from "react-redux";
 import { completeOrder } from "../redux/OrderSlice";
 import { useNavigation } from "@react-navigation/native";
+import { getColorName } from "../utils/colorUtils";
 
 const OrderItem = ({ item }: any) => {
   const order = item;
@@ -24,10 +26,13 @@ const OrderItem = ({ item }: any) => {
   };
   return (
     <View style={styles.container}>
-      <Text style={styles.status}>Trạng thái: {order?.status}</Text>
+      <View style={styles.header}>
+        <Text style={styles.orderId}>Mã đơn hàng: {order.id}</Text>
+        <Text style={styles.status}>{order.status}</Text>
+      </View>
       <FlatList
-        style={styles.list}
-        data={order?.orderDetails}
+        data={order.orderDetails}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }: any) => (
           <>
             <View style={{ flexDirection: "row", gap: 20 }}>
@@ -39,11 +44,11 @@ const OrderItem = ({ item }: any) => {
                 <Text style={styles.name}>{item?.productName}</Text>
                 <Text style={styles.classification}>
                   Size: {item?.productDetail?.size} -{" "}
-                  {item?.productDetail?.color}
+                  {getColorName(item?.productDetail?.color) || item?.productDetail?.color}
                 </Text>
                 <Text style={styles.quantity}>Số lượng: {item?.quantity}</Text>
                 <Text style={styles.price}>
-                  Đơn giá: {item?.productDetail?.price} VNĐ
+                  Đơn giá: {item?.productDetail?.price.toLocaleString('vi-VN')} VNĐ
                 </Text>
               </View>
             </View>
@@ -55,7 +60,7 @@ const OrderItem = ({ item }: any) => {
               }}
             >
               <Text style={[styles.totalPrice, { flex: 1 }]}>
-                Tổng giá: {item?.productDetail?.price * item?.quantity} VNĐ
+                Tổng giá: {(item?.productDetail?.price * item?.quantity).toLocaleString('vi-VN')} VNĐ
               </Text>
               {order.status === "DELIVERED" && (
                 <Pressable
@@ -82,76 +87,74 @@ const OrderItem = ({ item }: any) => {
 };
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderColor: "#ccc",
     backgroundColor: "#fff",
+    padding: 16,
+    marginBottom: 16,
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  list: {
-    width: "100%",
-    gap: 20,
-  },
-  itemContainer: {
+  header: {
     flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+  orderId: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  status: {
+    fontSize: 16,
+    color: "#007AFF",
   },
   image: {
-    width: 100,
-    height: 100,
-    marginRight: 10,
-    borderRadius: 5,
-  },
-  details: {
-    flex: 1,
+    width: 80,
+    height: 80,
+    borderRadius: 8,
   },
   name: {
     fontSize: 16,
     fontWeight: "bold",
+    marginBottom: 4,
   },
   classification: {
-    fontSize: 16,
-    color: "#000",
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 4,
   },
   quantity: {
-    fontSize: 16,
-    color: "#000",
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 4,
   },
   price: {
     fontSize: 14,
-    color: "#000",
+    color: "#e91e63",
+    marginBottom: 4,
   },
   totalPrice: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "bold",
     color: "#e91e63",
-    marginTop: 10,
-  },
-  status: {
-    fontSize: 15,
-    color: "#4caf50",
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  buttonAction: {
-    backgroundColor: "orange",
-    padding: 10,
-    alignItems: "center",
-    borderRadius: 5,
-    marginTop: 10,
   },
   buttonReview: {
-    backgroundColor: "orange",
-    width: "30%",
-    padding: 10,
-    alignItems: "center",
-    borderRadius: 5,
-    marginTop: 10,
-    alignSelf: "flex-end",
+    backgroundColor: "#007AFF",
+    padding: 8,
+    borderRadius: 4,
+    marginLeft: 8,
+  },
+  buttonAction: {
+    backgroundColor: "#4CAF50",
+    padding: 8,
+    borderRadius: 4,
+    marginLeft: 8,
   },
   text: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
   },
 });

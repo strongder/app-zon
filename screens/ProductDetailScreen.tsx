@@ -20,6 +20,7 @@ import Modal from "react-native-modal";
 import { fetchReviewByProduct } from "../redux/ReviewSlice";
 import { fetchProductById } from "../redux/ProductSlice";
 import SlideImage from "../components/SlideImage";
+import { getColorName, getColorRGB } from "../utils/colorUtils";
 
 const ProductDetailScreen = ({ route, navigation }: any) => {
   const { productId } = route.params;
@@ -40,7 +41,7 @@ const ProductDetailScreen = ({ route, navigation }: any) => {
   const classifications = product?.productDetailResponseList?.map(
     (varProduct: any) => ({
       id: varProduct.id,
-      color: varProduct.color,
+      color: getColorName(varProduct.color) || varProduct.color,
       size: varProduct.size,
       img: varProduct.img,
       price: varProduct.price,
@@ -73,7 +74,7 @@ const ProductDetailScreen = ({ route, navigation }: any) => {
       const classifications = product.productDetailResponseList.map(
         (varProduct: any) => ({
           id: varProduct.id,
-          color: varProduct.color,
+          color: getColorName(varProduct.color) || varProduct.color,
           size: varProduct.size,
           img: varProduct.img,
           price: varProduct.price,
