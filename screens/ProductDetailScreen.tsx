@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   Pressable,
   Button,
+  SafeAreaView,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import ReviewItem from "../components/ReviewItem";
@@ -20,6 +21,7 @@ import Modal from "react-native-modal";
 import { fetchReviewByProduct } from "../redux/ReviewSlice";
 import { fetchProductById } from "../redux/ProductSlice";
 import SlideImage from "../components/SlideImage";
+import { getColorName, getColorRGB } from "../utils/colorUtils";
 
 const ProductDetailScreen = ({ route, navigation }: any) => {
   const { productId } = route.params;
@@ -40,7 +42,7 @@ const ProductDetailScreen = ({ route, navigation }: any) => {
   const classifications = product?.productDetailResponseList?.map(
     (varProduct: any) => ({
       id: varProduct.id,
-      color: varProduct.color,
+      color: getColorName(varProduct.color) || varProduct.color,
       size: varProduct.size,
       img: varProduct.img,
       price: varProduct.price,
@@ -73,7 +75,7 @@ const ProductDetailScreen = ({ route, navigation }: any) => {
       const classifications = product.productDetailResponseList.map(
         (varProduct: any) => ({
           id: varProduct.id,
-          color: varProduct.color,
+          color: getColorName(varProduct.color) || varProduct.color,
           size: varProduct.size,
           img: varProduct.img,
           price: varProduct.price,
@@ -147,7 +149,7 @@ const ProductDetailScreen = ({ route, navigation }: any) => {
   };
 
   return (
-    <>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       {product && (
         <ScrollView style={styles.container}>
           <View
@@ -342,14 +344,13 @@ const ProductDetailScreen = ({ route, navigation }: any) => {
           </View> */}
         </ScrollView>
       )}
-    </>
+    </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    paddingTop: 10,
     backgroundColor: "#fff",
   },
   image: {

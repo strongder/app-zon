@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import CartScreen from "../screens/CartScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import { AntDesign, Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons";
-import HomeScreen from "../screens/HomeScreen";
+import HomeStack from "../navigation/HomeStack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import NotificationScreen from "../screens/NotificationScreen";
 import { useDispatch, useSelector } from "react-redux";
@@ -120,7 +120,7 @@ const BottomTabs = () => {
       />
       <Tab.Screen
         name="Home"
-        component={HomeScreen}
+        component={HomeStack}
         options={{
           tabBarLabel: "Home",
           tabBarLabelStyle: { color: "#008E97" },
