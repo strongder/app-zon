@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
 
   listProduct: {},
   productItem: {
-    flex: 1,
+    width: "47%",
     margin: 5,
   },
 });

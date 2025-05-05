@@ -102,7 +102,7 @@ const productSlice = createSlice({
         state.loading = "succeeded";
       })
       .addCase(fetchProduct.fulfilled, (state, action) => {
-        state.listProduct = action.payload;
+        state.listProduct = [...state.listProduct, ...action.payload];
         state.loading = "succeeded";
       })
       .addCase(fetchProductByCategory.fulfilled, (state, action) => {

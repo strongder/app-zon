@@ -152,12 +152,6 @@ const HomeScreen = () => {
             />
           )}
         </View>
-        {/* {listDiscountProduct &&
-          renderProductList(
-            "Sản phẩm giảm giá",
-            dataDiscount,
-            setpageProductDiscount
-          )} */}
         {listProduct &&
           renderProductList("Sản phẩm", data, setpageProduct)}
       </ScrollView>
@@ -175,7 +169,7 @@ const styles = StyleSheet.create({
   },
   listProduct: {},
   productItem: {
-    flex: 1,
+    width: "47%",
     margin: 5, // Thêm khoảng cách 10 giữa các sản phẩm (5 cho mỗi bên)
   },
   searchContainer: {

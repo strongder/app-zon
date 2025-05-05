@@ -370,6 +370,7 @@ const SearchScreen = ({ navigation, route }: any) => {
         keyExtractor={(item) => item.id + ""}
         showsHorizontalScrollIndicator={false}
         numColumns={2}
+        
       />
         )}
 
@@ -687,8 +688,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   productItem: {
-    flex: 1,
-    margin: 5, 
+    margin: 5,
+    width: "47%",
   },
   list: {
     paddingBottom: 20,
