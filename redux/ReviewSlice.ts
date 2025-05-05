@@ -48,7 +48,7 @@ const initialState: any = {
   loading: "idle",
 };
 
-const reviewSlice = createSlice({
+const reviewSlice = createSlice({ 
   name: "reviews",
   initialState,
   reducers: {},

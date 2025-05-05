@@ -99,16 +99,17 @@ const ProductDetailScreen = ({ route, navigation }: any) => {
   };
 
   useEffect(() => {
-    if (productId) dispatch(fetchProductById(productId));
-    // Fetch reviews when the page changes
-    const newParam = { pageNum: currentReviewPage };
-    if (product?.id) {
-      dispatch(
-        fetchReviewByProduct({ productId: product.id, param: newParam })
-      );
+    if (productId) {
+      dispatch(fetchProductById(productId));
     }
-  }, [dispatch, productId, currentReviewPage]);
-
+  }, [dispatch, productId]);
+  
+  useEffect(() => {
+    if (productId) {
+      const newParam = { pageNum: currentReviewPage };
+      dispatch(fetchReviewByProduct({ productId, param: newParam }));
+    }
+  }, [dispatch,productId, currentReviewPage]);
   // viet ham set san pham duoc chon sau khi chon color va size
   const handleAddProductToCard = () => {
     const selectedClassification = getFilteredClassifications()?.find(

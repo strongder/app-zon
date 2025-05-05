@@ -19,8 +19,9 @@ const SupportScreen = () => {
   // Địa chỉ và vị trí cửa hàng
   const storeInfo = {
     name: "Clothes Store", // Tên cửa hàng
-    address: "Sn 20, Ngõ 195, Đường Quang Trung, Quận Hà Đông , Hà Nội", // Địa chỉ cửa hàng
-    phone: "0123 456 789",
+    address: "Số 141 - Chiến Thắng - Văn Quán - Hà Đông - Hà Nội", // Địa chỉ cửa hàng
+    phone: "039 231 3572",
+    email: "hieuhua7802@gmail.com",
     latitude: 20.968688,
     longitude: 105.773500, 
   };
@@ -38,6 +39,7 @@ const SupportScreen = () => {
         <Text style={styles.text}>{storeInfo.name}</Text>
         <Text style={styles.text}>Địa chỉ: {storeInfo.address}</Text>
         <Text style={styles.text}>Điện thoại: {storeInfo.phone}</Text>
+        <Text style={styles.text}>Email : {storeInfo.email}</Text>
       </View>
       <View style={styles.paymentMethodsContainer}>
         <Text style={styles.paymentMethodTitle}>Hình thức thanh toán</Text>
