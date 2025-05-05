@@ -17,11 +17,25 @@ import BottomTabs from "../components/BottomTabs";
 import PaymentResultScreen from "../screens/PaymentResultScreen";
 import ProductReviewScreen from "../screens/ProductReviewScreen";
 import EditProfileScreen from "../screens/EditProfileScreen";
+
 const StackNaviagator = () => {
   const Stack = createNativeStackNavigator();
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: true,
+          headerTitleAlign: "center",
+          headerTitleStyle: {
+            color: "black",
+            fontSize: 22,
+            fontWeight: "bold",
+          },
+          headerStyle: {
+            backgroundColor: "white"
+          },
+        }}
+      >
         <Stack.Screen
           name="Main"
           component={BottomTabs}
@@ -37,65 +51,60 @@ const StackNaviagator = () => {
           component={RegisterScreen}
           options={{ headerShown: false }}
         />
-      
         <Stack.Screen
           name="Checkout"
           component={CheckoutScreen}
-          options={{ headerShown: true, title: "Thanh toán" }}
+          options={{ title: "Thanh toán" }}
         />
         <Stack.Screen
           name="ProductDetail"
           component={ProductDetailScreen}
-          options={{ headerShown: true, title: "Chi tiết sản phẩm" }}
+          options={{ title: "Chi tiết sản phẩm" }}
         />
         <Stack.Screen
           name="OrderHistory"
           component={OrderHistoryScreen}
-          options={{ headerShown: true, title: "Lịch sử đơn hàng" }}
+          options={{ title: "Lịch sử đơn hàng" }}
         />
         <Stack.Screen
           name="PaymentHistory"
           component={PaymentHistory}
-          options={{ headerShown: true, title: "Lịch sử thanh toán" }}
+          options={{ title: "Lịch sử thanh toán" }}
         />
         <Stack.Screen
           name="OrderDetail"
           component={OrderDetailScreen}
-          options={{ headerShown: true, title: "Chi tiết đơn hàng" }}
+          options={{ title: "Chi tiết đơn hàng" }}
         />
         <Stack.Screen
           name="SearchPage"
           component={SearchScreen}
-          options={{ headerShown: false 
-          }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Category"
           component={CategoryScreen}
-          options={{ headerShown: true, title: "Danh mục sản phẩm" }}
+          options={{ title: "Danh mục sản phẩm" }}
         />
-
         <Stack.Screen
           name="VnpayPayment"
           component={VnPayScreen}
-          options={{ headerShown: true, title: "Thanh toán vnpay" }}
+          options={{ title: "Thanh toán vnpay" }}
         />
-
-
         <Stack.Screen
           name="PaymentResult"
           component={PaymentResultScreen}
-          options={{ headerShown: true }}
+          options={{ title: "Kết quả thanh toán" }}
         />
         <Stack.Screen
           name="ProductReview"
           component={ProductReviewScreen}
-          options={{ headerShown: true, title: "Đánh giá sản phẩm" }}
+          options={{ title: "Đánh giá sản phẩm" }}
         />
         <Stack.Screen
           name="EditProfile"
           component={EditProfileScreen}
-          options={{ headerShown: true, title: "Sửa thông tin" }}
+          options={{ title: "Sửa thông tin" }}
         />
       </Stack.Navigator>
     </NavigationContainer>

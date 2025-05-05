@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   Pressable,
   Button,
+  SafeAreaView,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import ReviewItem from "../components/ReviewItem";
@@ -148,7 +149,7 @@ const ProductDetailScreen = ({ route, navigation }: any) => {
   };
 
   return (
-    <>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       {product && (
         <ScrollView style={styles.container}>
           <View
@@ -343,14 +344,13 @@ const ProductDetailScreen = ({ route, navigation }: any) => {
           </View> */}
         </ScrollView>
       )}
-    </>
+    </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    paddingTop: 10,
     backgroundColor: "#fff",
   },
   image: {
