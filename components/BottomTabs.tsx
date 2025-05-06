@@ -125,7 +125,7 @@ const BottomTabs = () => {
           tabBarLabel: "Home",
           tabBarLabelStyle: { color: "#008E97" },
           headerShown: true,
-          title: "E-STORE", 
+          title: "E-SHOP", 
           headerTitleStyle: {
             color: "blue", // Màu tiêu đề để nổi bật
             fontSize: 22, // Tăng kích cỡ tiêu đề
