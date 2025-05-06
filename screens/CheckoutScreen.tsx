@@ -18,50 +18,63 @@ import { placeOrder } from "../redux/OrderSlice";
 import { fetchCart } from "../redux/CartSlice";
 import { createPayment } from "../redux/PaymentSlice";
 
-
 const CheckoutScreen = ({ navigation, route }: any) => {
-  const { cartDetailIds, price, voucherId} = route.params;
+  const { cartDetailIds, price, voucherId } = route.params;
+
   const [paymentMethod, setPaymentMethod] = useState("CASH");
-  const [total, setTotal] = useState<number>(price);
   const [shippingMethod, setShippingMethod] = useState("FAST");
+  const [total, setTotal] = useState<number>(price);
+  const [shippingFee, setShippingFee] = useState<number>(0);
+
   const dispatch = useDispatch();
   const currentUser = useSelector((state: any) => state.users.currentUser);
+
   // Thông tin giao hàng
-  const [fullName, setFullName] = useState(currentUser?.firstName + currentUser?.lastName);
+  const [fullName, setFullName] = useState(
+    currentUser?.firstName + currentUser?.lastName
+  );
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState(currentUser?.address);
   const [note, setNote] = useState("");
 
+  useEffect(() => {
+    // Tính phí vận chuyển và tổng tiền
+    const fee = shippingMethod === "FAST" ? 15000 : 50000;
+    setShippingFee(fee);
+    setTotal(price + fee);
+  }, [shippingMethod, price]);
 
-  const checkInfo = () =>{
-    if(phoneNumber === ""|| fullName === "" || address === ""){
+  const checkInfo = () => {
+    if (phoneNumber === "" || fullName === "" || address === "") {
       Alert.alert("Thông báo", "Vui lòng điền đầy đủ thông tin giao hàng!");
       return false;
-    }return true;
-  }
+    }
+    return true;
+  };
 
   const handleCheckout = async () => {
     if (!checkInfo()) return;
+
     const data = {
       fullName: fullName,
       phone: phoneNumber,
-      note:note,
+      note: note,
       shippingAddress: address,
       shippingMethod: shippingMethod,
       paymentMethod: paymentMethod,
       cartDetailIds: cartDetailIds,
-      price_total: 10005000,
+      price_total: total,
       voucherId: voucherId,
-    }; 
-    
+    };
+
     console.log(data);
-    const action = await dispatch(placeOrder( data ));
+    const action = await dispatch(placeOrder(data));
     if (placeOrder.fulfilled.match(action)) {
-      const orderId = action.payload; // Assuming the orderId is in the payload
+      const orderId = action.payload;
       if (paymentMethod === "CASH") {
         navigation.navigate("OrderHistory");
       } else if (paymentMethod === "CREDIT_CARD") {
-        handleVnpayPayment(orderId); // Pass the orderId to the payment function
+        handleVnpayPayment(orderId);
       }
     }
     dispatch(fetchCart(currentUser.id));
@@ -70,12 +83,10 @@ const CheckoutScreen = ({ navigation, route }: any) => {
   const handleVnpayPayment = async (orderId: number) => {
     const param = {
       orderId: orderId,
-      amount : price
-    }
+      amount: total,
+    };
     const payment = await dispatch(createPayment({ param })).unwrap();
-    console.log(payment);
     if (payment && payment.paymentUrl) {
-      console.log("----------------------")
       navigation.navigate("VnpayPayment", { paymentUrl: payment.paymentUrl });
     }
   };
@@ -111,6 +122,7 @@ const CheckoutScreen = ({ navigation, route }: any) => {
             onChangeText={setNote}
           />
         </View>
+
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Phương thức vận chuyển</Text>
           <Picker
@@ -133,21 +145,27 @@ const CheckoutScreen = ({ navigation, route }: any) => {
           </Picker>
         </View>
 
+        {/* Chi phí đơn hàng */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Chi phí</Text>
           <Text style={styles.text}>
-            Đơn hàng: {total.toLocaleString("vi-VN")} VNĐ
+            Đơn hàng: {price.toLocaleString("vi-VN")} VNĐ
           </Text>
-          
+          <Text style={styles.text}>
+           Vận chuyển: {shippingFee.toLocaleString("vi-VN")} VNĐ
+          </Text>
         </View>
       </ScrollView>
-      <Text style={styles.totalText}>
-            Tổng cộng: {total.toLocaleString("vi-VN")} VNĐ
-          </Text>
+      {/* Tổng cộng */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Tổng cộng</Text>
+        <Text style={styles.totalText}>
+          {total.toLocaleString("vi-VN")} VNĐ
+        </Text>
+      </View>
       <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
         <Text style={styles.checkoutButtonText}>Xác nhận đặt hàng</Text>
       </TouchableOpacity>
-
     </View>
   );
 };
@@ -157,16 +175,16 @@ const styles = StyleSheet.create({
   scrollContainer: { paddingBottom: 80 },
   section: { marginBottom: 5 },
   sectionTitle: { fontSize: 20, fontWeight: "bold", marginBottom: 8 },
-  text: { paddingHorizontal: 20 },
+  text: { fontSize: 16, paddingHorizontal: 20 },
   totalText: {
     fontSize: 20,
     color: "red",
     fontWeight: "bold",
     marginTop: 8,
-    textAlign: "center",  // Canh giữa văn bản
+    textAlign: "center", // Canh giữa văn bản
     paddingBottom: 10, // Thêm padding dưới nếu cần
   },
-  
+
   checkoutButton: {
     backgroundColor: "#007bff",
     padding: 16,
@@ -181,6 +199,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingLeft: 10,
   },
+
   checkoutButtonText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
 });
 
