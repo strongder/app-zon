@@ -8,10 +8,7 @@ const VnPayScreen = ({ route, navigation}: any) => {
   
 
   const handleNavigationStateChange = (navState: any) => {
-    console.log("Navigation State:", navState);
-
-    if (navState.url.includes('vnpay-callback')) {
-
+    if (navState.url.includes('vn-pay-callback')) {
       const urlParams = new URLSearchParams(navState.url.split('?')[1]);
       const paymentStatus = urlParams.get('vnp_ResponseCode');
       navigation.navigate("PaymentResult", { isSuccess: paymentStatus });
