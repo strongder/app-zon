@@ -14,6 +14,7 @@ import {
   updatePaymentMethod,
 } from "../redux/OrderSlice";
 import { createPayment } from "../redux/PaymentSlice";
+import { getColorName } from "../utils/colorUtils";
 const OrderDetailScreen = ({ navigation, route }: any) => {
   const { orderId } = route.params;
   const dispatch = useDispatch();
@@ -110,7 +111,7 @@ const OrderDetailScreen = ({ navigation, route }: any) => {
                   <Text style={styles.text}>Số lượng: {item.quantity}</Text>
                   <Text style={styles.text}>
                     Phân loại: {item.productDetail.size} -{" "}
-                    {item.productDetail.color}
+                    {getColorName(item.productDetail.color) || item.productDetail.color}
                   </Text>
                 </View>
               </View>
