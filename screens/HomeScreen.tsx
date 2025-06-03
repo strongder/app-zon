@@ -20,6 +20,8 @@ import {
   fetchProduct,
   fetchProductByCategory,
   fetchProductByDiscount,
+  fetchSuggestedProducts,
+  fetchNewProducts,
 } from "../redux/ProductSlice";
 
 const HomeScreen = () => {
@@ -28,11 +30,12 @@ const HomeScreen = () => {
   const dispatch = useDispatch();
   const [pageProductDiscount, setpageProductDiscount] = useState(0);
   const [pageProduct, setpageProduct] = useState(0);
+  const [pageNew, setPageNew] = useState(0);
   const { categories } = useSelector((state: any) => state.categories);
   const param = {
     pageNum: 0,
   };
-  const { listProduct, listDiscountProduct } = useSelector(
+  const { listProduct, listDiscountProduct, suggestedProducts, newProducts } = useSelector(
     (state: any) => state.products
   );
   const [data, setData] = useState<any>([]);
@@ -50,6 +53,15 @@ const HomeScreen = () => {
     dispatch(fetchCategoryAll());
   }, [dispatch]);
 
+  useEffect(() => {
+    dispatch(fetchSuggestedProducts());
+  }, [dispatch]);
+
+  useEffect(() => {
+    const newParam = { ...param, pageNum: pageNew };
+    dispatch(fetchNewProducts({ param: newParam }));
+  }, [dispatch, pageNew]);
+
   const handleSearch = () => {
     navigation.navigate("SearchPage", {searchTerm});
   };
@@ -59,50 +71,113 @@ const HomeScreen = () => {
     navigation.navigate("Category");
   };
   console.log(data);
-  const renderProductList = (title: string, data: any, setPage: any) => (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      <FlatList
-        scrollEnabled={false}
-        data={data}
-        renderItem={({ item }) => (
-          <Pressable
-            onPress={() =>
-              navigation.navigate("ProductDetail", { productId: item.id })
-            }
-            style={styles.productItem}
-          >
-            <ProductItem product={item} />
-          </Pressable>
-        )}
-        keyExtractor={(item) => item.id + ""}
-        showsHorizontalScrollIndicator={false}
-        numColumns={2}
-      />
-      <Pressable onPress={() => setPage((prev: any) => prev + 1)}>
-        <Text>Xem thêm</Text>
-      </Pressable>
-    </View>
-  );
+
+  // Thêm hàm kiểm tra dữ liệu sản phẩm
+  const isValidProduct = (item: any) => {
+    return item && typeof item === 'object' && item.id !== undefined;
+  };
+
+  // Thêm hàm tạo key duy nhất
+  const generateUniqueKey = (item: any, index: number, prefix: string) => {
+    if (!isValidProduct(item)) {
+      return `${prefix}-invalid-${index}`;
+    }
+    return `${prefix}-${item.id}-${index}`;
+  };
+
+  const renderProductList = (title: string, data: any, setPage: any, prefix: string) => {
+    const validData = Array.isArray(data) ? data.filter(isValidProduct) : [];
+    
+    if (validData.length === 0) return null;
+
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+        <FlatList
+          key={'grid'}
+          scrollEnabled={false}
+          data={validData}
+          renderItem={({ item, index }) => (
+            <Pressable
+              onPress={() =>
+                navigation.navigate("ProductDetail", { productId: item.id })
+              }
+              style={styles.productItem}
+            >
+              <ProductItem product={item} />
+            </Pressable>
+          )}
+          keyExtractor={(item, index) => generateUniqueKey(item, index, prefix)}
+          showsHorizontalScrollIndicator={false}
+          numColumns={2}
+        />
+        <Pressable onPress={() => setPage((prev: any) => prev + 1)}>
+          <Text>Xem thêm</Text>
+        </Pressable>
+      </View>
+    );
+  };
+
+  const renderHorizontalProductList = (title: string, data: any, prefix: string) => {
+    const validData = Array.isArray(data) ? data.filter(isValidProduct) : [];
+    
+    if (validData.length === 0) return null;
+
+    return (
+      <View style={styles.section}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+          <Text style={styles.sectionTitle}>{title}</Text>
+        </View>
+        <FlatList
+          key={'horizontal-' + prefix}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          data={validData}
+          renderItem={({ item, index }) => (
+            <Pressable
+              onPress={() =>
+                navigation.navigate("ProductDetail", { productId: item.id })
+              }
+              style={styles.horizontalProductItem}
+            >
+              <View style={styles.horizontalProductContainer}>
+                <Image
+                  source={{ uri: item.img }}
+                  style={styles.horizontalProductImage}
+                />
+                <View style={styles.horizontalProductInfo}>
+                  <Text style={styles.horizontalProductName} numberOfLines={2}>
+                    {item.name}
+                  </Text>
+                  <Text style={styles.horizontalProductPrice}>
+                    {item.priceRange?.toLocaleString('vi-VN')} VNĐ
+                  </Text>
+                  <Text style={styles.horizontalProductRating}>
+                    {item.star ? `⭐ ${item.star}` : 'Chưa có đánh giá'}
+                  </Text>
+                </View>
+              </View>
+            </Pressable>
+          )}
+          keyExtractor={(item, index) => generateUniqueKey(item, index, prefix)}
+        />
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.searchContainer}>
-          <Pressable style={styles.searchBox}>
-            <AntDesign
-              style={styles.searchIcon}
-              name="search1"
-              size={24}
-              color="black"
-            />
-            <TextInput
-              placeholder="Search"
-              style={styles.searchInput}
-              value={searchTerm}
-              onChangeText={setSearchTerm}
-              onSubmitEditing={handleSearch}
-            />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Tìm kiếm sản phẩm..."
+            value={searchTerm}
+            onChangeText={setSearchTerm}
+            onSubmitEditing={handleSearch}
+          />
+          <Pressable onPress={handleSearch}>
+            <Ionicons name="search" size={24} color="black" />
           </Pressable>
         </View>
 
@@ -128,12 +203,12 @@ const HomeScreen = () => {
               <AntDesign name="right" size={18} color="black" />
             </Text>
           </View>
-          {categories && (
+          {categories && Array.isArray(categories) && (
             <FlatList
               horizontal
               scrollEnabled={true}
               data={categories}
-              renderItem={({ item }) => (
+              renderItem={({ item, index }) => (
                 <Pressable
                   style={styles.categoryItem}
                   onPress={() => handleSelectCategory(item?.id)}
@@ -142,18 +217,26 @@ const HomeScreen = () => {
                     <Image
                       source={{ uri: item?.img }}
                       style={{ width: 80, height: 80, borderRadius: 50 }}
-                    ></Image>
+                    />
                     <Text style={styles.categoryText}>{item?.name}</Text>
                   </View>
                 </Pressable>
               )}
-              keyExtractor={(item) => item.id + ""}
+              keyExtractor={(item, index) => `category-${item?.id || index}`}
               showsHorizontalScrollIndicator={true}
             />
           )}
         </View>
-        {listProduct &&
-          renderProductList("Sản phẩm", data, setpageProduct)}
+
+        {suggestedProducts && suggestedProducts.length > 0 && 
+          renderHorizontalProductList("Sản phẩm gợi ý cho bạn", suggestedProducts, 'suggested')
+        }
+
+        {newProducts && newProducts.length > 0 && 
+          renderHorizontalProductList("Sản phẩm mới", newProducts, 'new')
+        }
+
+        {listProduct && renderProductList("Tất cả sản phẩm", data, setpageProduct, 'all')}
       </ScrollView>
     </SafeAreaView>
   );
@@ -206,12 +289,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   section: {
-    padding: 10,
+    padding: 15,
+    backgroundColor: '#fff',
+    marginBottom: 10,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
+    fontWeight: 'bold',
+    color: '#333',
   },
   categoryItem: {
     padding: 10,
@@ -221,5 +306,47 @@ const styles = StyleSheet.create({
   },
   categoryText: {
     fontSize: 16,
+  },
+  horizontalProductItem: {
+    width: 200,
+    marginRight: 15,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  horizontalProductContainer: {
+    padding: 10,
+  },
+  horizontalProductImage: {
+    width: '100%',
+    height: 150,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  horizontalProductInfo: {
+    padding: 5,
+  },
+  horizontalProductName: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 4,
+    color: '#333',
+  },
+  horizontalProductPrice: {
+    fontSize: 14,
+    color: '#e91e63',
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  horizontalProductRating: {
+    fontSize: 12,
+    color: '#666',
   },
 });

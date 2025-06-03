@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../api";
+import { configAxios } from "../api";
 
 export const fetchProductById: any = createAsyncThunk(
   "products/fetchProductById",
@@ -80,6 +81,44 @@ export const fetchProductBySearchExtend: any = createAsyncThunk(
   }
 );
 
+export const fetchSuggestedProducts: any = createAsyncThunk(
+  "products/fetchSuggestedProducts",
+  async () => {
+    try {
+      const response = await axiosInstance.get(
+        `kmeans/productCluster`
+      );
+      console.log("Suggested Products Response:", JSON.stringify(response.data, null, 2));
+      if (response.data && response.data.data) {
+        return response.data.data;
+      }
+      return [];
+    } catch (error) {
+      console.log("Get suggested products fail:", error);
+      return [];
+    }
+  }
+);
+
+export const fetchNewProducts: any = createAsyncThunk(
+  "products/fetchNewProducts",
+  async ({ param }: any) => {
+    try {
+      const response = await axiosInstance.get(
+        `public/newproduct`,
+        param ? { params: param } : {}
+      );
+      console.log("New Products Response:", JSON.stringify(response.data, null, 2));
+      if (response.data && response.data.data) {
+        return Array.isArray(response.data.data) ? response.data.data : [];
+      }
+      return [];
+    } catch (error) {
+      console.log("Get new products fail:", error);
+      return [];
+    }
+  }
+);
 
 const initialState: any = {
   listProduct: [],
@@ -87,6 +126,8 @@ const initialState: any = {
   productSearchExtend: [],
   listProductByCategory: [],
   listDiscountProduct: [],
+  suggestedProducts: [],
+  newProducts: [],
   product: {},
   loading: "idle",
 };
@@ -119,6 +160,14 @@ const productSlice = createSlice({
       })
       .addCase(fetchProductBySearchExtend.fulfilled, (state, action) => {
         state.productSearchExtend = action.payload;
+        state.loading = "succeeded";
+      })
+      .addCase(fetchSuggestedProducts.fulfilled, (state, action) => {
+        state.suggestedProducts = action.payload || [];
+        state.loading = "succeeded";
+      })
+      .addCase(fetchNewProducts.fulfilled, (state, action) => {
+        state.newProducts = action.payload;
         state.loading = "succeeded";
       });
   },
