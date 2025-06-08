@@ -3,7 +3,6 @@ import { View, Text, Image, StyleSheet } from "react-native";
 import axiosInstance from "../api";
 
 const NotifyItem = ({ notifyItem }: any) => {
-  console.log("NotifyItem render", notifyItem);
   const [order, setOrder] = useState<any>(null);
 
   // Fetch order details if notification type is 'ORDER'
@@ -18,7 +17,6 @@ const NotifyItem = ({ notifyItem }: any) => {
   const fetchOrderDetails = async (orderId: any) => {
     try {
       const response = await axiosInstance.get(`/orders/${orderId}`);
-      console.log("Order details response:", response.data.data);
       setOrder(response.data.data);
     } catch (error) {
       console.error("Failed to fetch order details:", error);

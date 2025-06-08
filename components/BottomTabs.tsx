@@ -15,6 +15,7 @@ import {
 import useSocket from "../hook/useSocket";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SupportScreen from "../screens/SupportScreen";
+import OrderHistoryScreen from "../screens/OrderHistoryScreen";
 
 const BottomTabs = () => {
   const Tab = createBottomTabNavigator();

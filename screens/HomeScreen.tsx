@@ -16,6 +16,7 @@ import { useNavigation } from "@react-navigation/native";
 import ProductItem from "../components/ProductItem";
 import { useDispatch, useSelector } from "react-redux";
 import {fetchCategoryAll } from "../redux/CategorySlice";
+import { configAxios } from "../api";
 import {
   fetchProduct,
   fetchProductByCategory,
@@ -70,7 +71,6 @@ const HomeScreen = () => {
     await dispatch(fetchProductByCategory({ id: id, param: param }));
     navigation.navigate("Category");
   };
-  console.log(data);
 
   // Thêm hàm kiểm tra dữ liệu sản phẩm
   const isValidProduct = (item: any) => {

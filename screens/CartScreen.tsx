@@ -107,6 +107,12 @@ const CartScreen = ({ navigation }: any) => {
     });
   };
 
+  // Thêm hàm loại bỏ thẻ HTML
+  function stripHtml(html: string) {
+    if (!html) return '';
+    return html.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ');
+  }
+
   return (
     <View style={styles.container}>
       {cart && (
@@ -137,7 +143,7 @@ const CartScreen = ({ navigation }: any) => {
                     onPress={() => setSelectedVoucher(voucher)}
                   >
                     <Text>
-                      {voucher?.code} - {voucher?.description}
+                      {voucher?.code} - {stripHtml(voucher?.description)}
                     </Text>
                   </TouchableOpacity>
                 ))}

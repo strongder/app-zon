@@ -32,7 +32,6 @@ const OrderDetailScreen = ({ navigation, route }: any) => {
       status: "CANCELED", // đảm bảo đúng enum
       paymentStatus: order.paymentStatus,
     };
-    console.log("param", param);
     dispatch(cancelOrder({ param }))
       .unwrap()
       .then(() => {
@@ -52,9 +51,7 @@ const OrderDetailScreen = ({ navigation, route }: any) => {
         amount : order.totalAmount,
       }
       const payment = await dispatch(createPayment({ param })).unwrap();
-      console.log(payment);
       if (payment && payment.paymentUrl) {
-        console.log("----------------------")
         navigation.navigate("VnpayPayment", { paymentUrl: payment.paymentUrl });
       }
     };
@@ -70,7 +67,6 @@ const OrderDetailScreen = ({ navigation, route }: any) => {
     setIsChangingPayment(false);
   };
 
-  console.log("check", order);
 
   return (
     <View

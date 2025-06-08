@@ -62,7 +62,6 @@ const notiffiSlice = createSlice({
       })
       .addCase(readNotification.fulfilled, (state, action) => {
         const id = action.payload;
-        console.log("readNotification", id);
         state.notifications = state.notifications.map((noti: any) =>
           noti.id === id ? { ...noti, read: true } : noti
         );

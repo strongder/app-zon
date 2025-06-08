@@ -17,11 +17,9 @@ const useSocket = (topic: any, token: any, handleReceivedData: any) => {
     client.connect(
       {},
       (frame: any) => {
-        console.log("Connected: " + frame);
         setConnected(true);
         client.subscribe(topic, (message) => {
           const data = JSON.parse(message.body);
-          console.log(data);
           handleReceivedData(data)
         });
       },

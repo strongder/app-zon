@@ -17,10 +17,8 @@ const OrderHistoryScreen = ({ navigation }: any) => {
   const orders = useSelector((state: any) => state.orders.listOrderByUser);
   const currentUser = useSelector((state: any) => state.users.currentUser);
 
-  console.log("listOrder", orders);
   // Fetch orders by user
   useEffect(() => {
-    console.log(currentUser.id);
     if (currentUser.id) {
       dispatch(fetchOrderByUser(currentUser.id));
     }

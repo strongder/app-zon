@@ -86,7 +86,7 @@ export const fetchSuggestedProducts: any = createAsyncThunk(
   async () => {
     try {
       const response = await axiosInstance.get(
-        `kmeans/productCluster`
+        `/kmeans`
       );
       console.log("Suggested Products Response:", JSON.stringify(response.data, null, 2));
       if (response.data && response.data.data) {
@@ -109,7 +109,7 @@ export const fetchNewProducts: any = createAsyncThunk(
         param ? { params: param } : {}
       );
       console.log("New Products Response:", JSON.stringify(response.data, null, 2));
-      if (response.data && response.data.data) {
+            if (response.data && response.data.data) {
         return Array.isArray(response.data.data) ? response.data.data : [];
       }
       return [];

@@ -104,7 +104,6 @@ const SearchScreen = ({ navigation, route }: any) => {
       setLoading(true);
 
       const filterRequest = createFilterRequest();
-      console.log("Sending request:", filterRequest);
 
       try {
         const action = await dispatch(fetchProductBySearchExtend(filterRequest));

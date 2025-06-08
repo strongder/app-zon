@@ -27,11 +27,12 @@ export const login: any = createAsyncThunk(
 
 
 interface AuthState {
-    token: string | null; // Cho phép null
+    token: string | null;
     loading: string
 }
+
 const initialState: AuthState = {
-  token: AsyncStorage.getItem("token")+'' || null,
+  token: null,
   loading: "idle",
 };
 
@@ -40,7 +41,6 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    // standard reducer logic, with auto-generated action types per reducer
     logout: (state) => {
         state.token = null;
         AsyncStorage.removeItem("token");
@@ -53,7 +53,10 @@ const authSlice = createSlice({
         })
         .addCase(login.fulfilled, (state, action) => {
             state.loading = "succeeded";
-            state.token = action.payload.accessToken;
+            if (action.payload?.accessToken) {
+                state.token = action.payload.accessToken;
+                AsyncStorage.setItem("token", action.payload.accessToken);
+            }
         })
   },
 });
